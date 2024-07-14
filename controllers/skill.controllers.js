@@ -44,7 +44,7 @@ export const getSkill = async (req, res, next) => {
   try {
     const { userId } = req
     const { page = 1, limit = 10 } = req.query
-
+    const hostname = req.headers["host"]
     const pipeline = [
       { $match: { user: userId } },
       //  Pagination and projection
@@ -54,6 +54,13 @@ export const getSkill = async (req, res, next) => {
           data: [
             { $skip: (parseInt(page) - 1) * parseInt(limit) },
             { $limit: parseInt(limit) },
+            {
+              $addFields: {
+                imageUrl: {
+                  $concat: [`${hostname}/image/`, { $toString: "$imageId" }],
+                },
+              },
+            },
             // Optionally, add $project stage here for specific fields
           ],
 
@@ -138,13 +145,12 @@ export const createSkill = async (req, res, next) => {
     const { name, rating, stack, description, base64 } = req?.body
     await checkIfExists(Skill, "name", name, "Skill already exists")
 
-    const { imageId, imageUrl } = await UploadImage(name, base64, userId)
+    const { imageId } = await UploadImage(name, base64, userId)
     const newSkill = new Skill({
       name,
       rating,
       stack,
       imageId,
-      imageUrl,
       description,
       user: userId,
     })
@@ -183,8 +189,7 @@ export const updateSkill = async (req, res, next) => {
       if (skill) {
         await deleteImage(skill?.imageId)
       }
-      const { imageId, imageUrl } = await UploadImage(name, base64, userId)
-      skill.imageUrl = imageUrl
+      const { imageId } = await UploadImage(name, base64, userId)
       skill.imageId = imageId
     }
 

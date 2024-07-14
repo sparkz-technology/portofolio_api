@@ -14,10 +14,6 @@ const projectSchema = new mongoose.Schema({
     type: Array,
     required: true,
   },
-  imageUrl: {
-    type: String,
-    required: true,
-  },
   githubUrl: {
     type: String,
     required: true,

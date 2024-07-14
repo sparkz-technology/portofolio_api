@@ -6,6 +6,7 @@ import checkIfExists from "../validators/checkIfExists.js"
 export const getProject = async (req, res, next) => {
   try {
     const { userId } = req
+    const hostname = req.headers["host"]
     const { page = 1, limit = 10 } = req.query
     const pipeline = [
       { $match: { user: userId } },
@@ -16,6 +17,13 @@ export const getProject = async (req, res, next) => {
           data: [
             { $skip: (parseInt(page) - 1) * parseInt(limit) },
             { $limit: parseInt(limit) },
+            {
+              $addFields: {
+                imageUrl: {
+                  $concat: [`${hostname}/image/`, { $toString: "$imageId" }],
+                },
+              },
+            },
             // Optionally, add $project stage here for specific fields
           ],
 
@@ -64,12 +72,11 @@ export const createProject = async (req, res, next) => {
     const { userId } = req
     const { name, description, stack, base64, liveUrl, githubUrl } = req?.body
     await checkIfExists(Project, "name", name, "Project already exists")
-    const { imageId, imageUrl } = await UploadImage(name, base64, userId)
+    const { imageId } = await UploadImage(name, base64, userId)
     const newProject = new Project({
       name,
       description,
       imageId,
-      imageUrl,
       stack,
       githubUrl,
       liveUrl,
@@ -140,8 +147,7 @@ export const updateProject = async (req, res, next) => {
       if (project) {
         await deleteImage(project?.imageId)
       }
-      const { imageId, imageUrl } = await UploadImage(name, base64, userId)
-      project.imageUrl = imageUrl
+      const { imageId } = await UploadImage(name, base64, userId)
       project.imageId = imageId
     }
     project.name = name

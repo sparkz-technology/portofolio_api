@@ -2,7 +2,6 @@ import mongoose from "mongoose"
 
 const profileSchema = new mongoose.Schema({
   views: { type: Number, default: 0 },
-  imageUrl: { type: String, default: "" },
   homeInfo: { type: String, default: "" },
   aboutInfo: { type: String, default: "" },
   resumeLink: { type: String, default: "" },

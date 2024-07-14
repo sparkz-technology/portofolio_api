@@ -6,9 +6,16 @@ export const getProfile = async (req, res, next) => {
   try {
     const { userId } = req
 
-    const profile = await Profile.find({ user: userId })
+    const profile = await Profile.find({ user: userId }).lean()
+    const hostUrl = req.headers["host"]
+
+    const profilesWithImageUrls = profile.map((p) => ({
+      ...p,
+      imageUrl: `${hostUrl}/image/${p.imageId}`,
+    }))
+
     res.json({
-      data: profile || [],
+      data: profilesWithImageUrls || [],
       status: "success",
     })
   } catch (error) {
@@ -21,7 +28,6 @@ export const updateProfile = async (req, res, next) => {
     const { userId } = req
     const {
       id,
-      imageUrl,
       base64,
       homeInfo,
       aboutInfo,
@@ -44,10 +50,12 @@ export const updateProfile = async (req, res, next) => {
       if (existingProfile?.imageId) {
         await deleteImage(existingProfile?.imageId)
       }
-      const { imageId: uploadedImageId, imageUrl: uploadedImageUrl } =
-        await UploadImage("profile", base64, userId)
+      const { imageId: uploadedImageId } = await UploadImage(
+        "profile",
+        base64,
+        userId
+      )
       existingProfile.imageId = uploadedImageId
-      existingProfile.imageUrl = uploadedImageUrl
     }
     existingProfile.email = email
     existingProfile.aboutInfo = aboutInfo

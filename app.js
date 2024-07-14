@@ -18,7 +18,7 @@ app.use(cors({ origin: "*" }))
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to my API" })
 })
-app.get("/img/:id", getImage)
+app.get("/image/:id", getImage)
 app.use("/user", userRouter)
 app.use("/skill", skillRouter)
 app.use("/project", projectRouter)
