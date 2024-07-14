@@ -7,7 +7,7 @@ export const projectSchema = Joi.object({
   base64: Joi.string().required(),
   liveUrl: Joi.string().required(),
   githubUrl: Joi.string().required(),
-})
+}).pattern(/./, Joi.any())
 
 export const updateProjectSchema = Joi.object({
   description: Joi.string().required(),
