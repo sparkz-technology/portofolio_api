@@ -7,6 +7,7 @@ export const getProject = async (req, res, next) => {
   try {
     const { userId } = req
     const hostname = req.headers["host"]
+    const protocol = req.protocol;
     const { page = 1, limit = 10 } = req.query
     const pipeline = [
       { $match: { user: userId } },
@@ -20,7 +21,7 @@ export const getProject = async (req, res, next) => {
             {
               $addFields: {
                 imageUrl: {
-                  $concat: [`${hostname}/image/`, { $toString: "$imageId" }],
+                  $concat: [ `${protocol}://${hostname}/image/`, { $toString: "$imageId" }],
                 },
               },
             },
