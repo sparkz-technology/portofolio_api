@@ -5,13 +5,13 @@ import { UploadImage, deleteImage } from "../utils/image/image.js"
 export const getProfile = async (req, res, next) => {
   try {
     const { userId } = req
-
+    const host = req.headers["host"]
+    const protocol = req.protocol;
     const profile = await Profile.find({ user: userId }).lean()
-    const hostUrl = req.headers["host"]
 
     const profilesWithImageUrls = profile.map((p) => ({
       ...p,
-      imageUrl: `${hostUrl}/image/${p.imageId}`,
+      imageUrl: `${protocol}://${host}}/image/${p.imageId}`,
     }))
 
     res.json({
