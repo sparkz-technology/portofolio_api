@@ -11,7 +11,7 @@ export const getProfile = async (req, res, next) => {
 
     const profilesWithImageUrls = profile.map((p) => ({
       ...p,
-      imageUrl: `${protocol}://${host}}/image/${p.imageId}`,
+      imageUrl: `${protocol}://${host}/image/${p.imageId}`,
     }))
 
     res.json({
