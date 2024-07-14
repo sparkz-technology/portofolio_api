@@ -45,6 +45,7 @@ export const getSkill = async (req, res, next) => {
     const { userId } = req
     const { page = 1, limit = 10 } = req.query
     const hostname = req.headers["host"]
+    const protocol = req.protocol;
     const pipeline = [
       { $match: { user: userId } },
       //  Pagination and projection
@@ -57,7 +58,7 @@ export const getSkill = async (req, res, next) => {
             {
               $addFields: {
                 imageUrl: {
-                  $concat: [`${hostname}/image/`, { $toString: "$imageId" }],
+                  $concat: [ `${protocol}://${hostname}/image/`, { $toString: "$imageId" }],
                 },
               },
             },
